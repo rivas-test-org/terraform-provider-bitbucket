@@ -32,3 +32,36 @@ resource "bitbucket_xxx" "example" {
   ...
 }
 ```
+### With Api key and Secret Key for Api V2
+Please set the following environment variables:
+
+```hcl
+provider "bitbucket" {
+  username = "my-username" 
+  password = "my-password"
+  apikey  = "my-apikey"
+  secretkey = "my-secretkey"
+}
+
+provider "bitbucket" {}
+
+resource "bitbucket_xxx" "example" {
+  ...
+}
+```
+### With Token for Api V2
+Please set the following environment variables:
+
+```hcl
+provider "bitbucket" {
+  username = "my-username" 
+  password = "my-password"
+  token  = "my-token"
+}
+
+provider "bitbucket" {}
+
+resource "bitbucket_xxx" "example" {
+  ...
+}
+```

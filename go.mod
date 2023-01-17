@@ -1,4 +1,4 @@
-module github.com/zahiar/terraform-provider-bitbucket
+module github.com/idealista/terraform-provider-bitbucket
 
 go 1.19
 

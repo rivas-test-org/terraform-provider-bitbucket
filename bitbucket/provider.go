@@ -7,7 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	gobb "github.com/ktrysmt/go-bitbucket"
 
-	v1 "github.com/zahiar/terraform-provider-bitbucket/bitbucket/api/v1"
+	v1 "github.com/idealista/terraform-provider-bitbucket/bitbucket/api/v1"
 )
 
 func Provider() *schema.Provider {
@@ -23,6 +23,24 @@ func Provider() *schema.Provider {
 				Type:        schema.TypeString,
 				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("BITBUCKET_PASSWORD", nil),
+				Description: "Password to authenticate with Bitbucket.",
+			},
+			"apikey": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				DefaultFunc: schema.EnvDefaultFunc("BITBUCKET_APIKEY", nil),
+				Description: "Password to authenticate with Bitbucket.",
+			},
+			"apisecret": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				DefaultFunc: schema.EnvDefaultFunc("BITBUCKET_SECRETKEY", nil),
+				Description: "Password to authenticate with Bitbucket.",
+			},
+			"token": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				DefaultFunc: schema.EnvDefaultFunc("BITBUCKET_TOKEN", nil),
 				Description: "Password to authenticate with Bitbucket.",
 			},
 		},
@@ -72,12 +90,6 @@ type Clients struct {
 }
 
 func configureProvider(ctx context.Context, resourceData *schema.ResourceData) (interface{}, diag.Diagnostics) {
-	client := gobb.NewBasicAuth(
-		resourceData.Get("username").(string),
-		resourceData.Get("password").(string),
-	)
-	client.Pagelen = 100
-	client.MaxDepth = 10
 
 	v1Client := v1.NewClient(
 		&v1.Auth{
@@ -86,10 +98,53 @@ func configureProvider(ctx context.Context, resourceData *schema.ResourceData) (
 		},
 	)
 
-	clients := &Clients{
-		V1: v1Client,
-		V2: client,
+	if (resourceData.Get("apikey").(string) != "") && (resourceData.Get("apisecret").(string) != ""){
+		client := gobb.NewOAuthClientCredentials(
+			resourceData.Get("apikey").(string),
+			resourceData.Get("apisecret").(string),
+		)
+
+		client.Pagelen = 100
+		client.MaxDepth = 10
+	
+		clients := &Clients{
+			V1: v1Client,
+			V2: client,
+		}
+	
+		return clients, nil
+
+	} else if (resourceData.Get("token").(string) != ""){
+		client := gobb.NewOAuthbearerToken(
+			resourceData.Get("token").(string),
+		)
+
+		client.Pagelen = 100
+		client.MaxDepth = 10
+	
+		clients := &Clients{
+			V1: v1Client,
+			V2: client,
+		}
+	
+		return clients, nil
+	
+	} else {
+		client := gobb.NewBasicAuth(
+			resourceData.Get("username").(string),
+			resourceData.Get("password").(string),
+		)
+
+		client.Pagelen = 100
+		client.MaxDepth = 10
+	
+		clients := &Clients{
+			V1: v1Client,
+			V2: client,
+		}
+	
+		return clients, nil
 	}
 
-	return clients, nil
+	return nil, nil
 }
