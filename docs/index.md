@@ -33,12 +33,10 @@ resource "bitbucket_xxx" "example" {
 }
 ```
 ### With Api key and Secret Key for Api V2
-Please set the following environment variables:
+API v1 does not work with this credentials
 
 ```hcl
 provider "bitbucket" {
-  username = "my-username" 
-  password = "my-password"
   apikey  = "my-apikey"
   secretkey = "my-secretkey"
 }
@@ -50,12 +48,10 @@ resource "bitbucket_xxx" "example" {
 }
 ```
 ### With Token for Api V2
-Please set the following environment variables:
+API v1 does not work with this credentials
 
 ```hcl
 provider "bitbucket" {
-  username = "my-username" 
-  password = "my-password"
   token  = "my-token"
 }
 
